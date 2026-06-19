@@ -19,22 +19,33 @@ export default async function UnidadPage() {
   const hoy = new Date();
   hoy.setHours(0, 0, 0, 0);
 
-  let parte = await getPartePorDependenciaYFecha(session.dependenciaId, hoy);
-
-  // Si no existe el parte de hoy, crearlo automáticamente
-  if (!parte) {
-    await crearParte({
-      dependenciaId: session.dependenciaId,
-      fecha: hoy.toISOString(),
-      responsableCarga: session.nombre,
-    });
+  let parte: any;
+  let causas: any[] = [];
+  try {
     parte = await getPartePorDependenciaYFecha(session.dependenciaId, hoy);
-  }
 
-  const causas = await (db as any).causaAusencia.findMany({
-    where: { activa: true },
-    orderBy: { causa: "asc" },
-  });
+    if (!parte) {
+      await crearParte({
+        dependenciaId: session.dependenciaId,
+        fecha: hoy.toISOString(),
+        responsableCarga: session.nombre,
+      });
+      parte = await getPartePorDependenciaYFecha(session.dependenciaId, hoy);
+    }
+
+    causas = await (db as any).causaAusencia.findMany({
+      where: { activa: true },
+      orderBy: { causa: "asc" },
+    });
+  } catch (e: any) {
+    return (
+      <div className="p-6 bg-red-50 border border-red-200 rounded-lg">
+        <h2 className="text-red-800 font-bold text-lg mb-2">Error al cargar el parte</h2>
+        <p className="text-red-700 font-mono text-sm bg-red-100 p-3 rounded">{e?.message ?? String(e)}</p>
+        <p className="text-red-600 text-xs mt-2">Stack: {e?.stack?.slice(0, 500)}</p>
+      </div>
+    );
+  }
 
   const fechaStr = format(hoy, "EEEE d 'de' MMMM 'de' yyyy", { locale: es });
 
