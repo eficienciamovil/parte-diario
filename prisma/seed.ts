@@ -1,6 +1,7 @@
 import { PrismaClient } from "../app/generated/prisma/client";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import bcrypt from "bcryptjs";
+import { personalData } from "./personal-data";
 
 const adapter = new PrismaBetterSqlite3({ url: process.env.DATABASE_URL ?? "file:./dev.db" });
 const prisma = new PrismaClient({ adapter } as never);
@@ -73,8 +74,53 @@ async function main() {
     });
   }
 
+  // Personal
+  const mapUnidad: Record<string, string> = {
+    "dir int": "DIR-INT",
+    "sas mil": "SAS-MIL",
+    "b int 601": "B-INT-601",
+  };
+
+  function depCodigo(unidad: string): string | null {
+    const u = unidad.toLowerCase();
+    if (u.startsWith("dir int") || u.startsWith("com dir int")) return "DIR-INT";
+    if (u.startsWith("sas mil")) return "SAS-MIL";
+    if (u.startsWith("b int 601")) return "B-INT-601";
+    return null;
+  }
+
+  let importados = 0;
+  for (const p of personalData) {
+    const cod = depCodigo(p.unidad);
+    if (!cod || !depMap[cod]) continue;
+    await (prisma as any).personal.upsert({
+      where: { id: p.nro },
+      update: {
+        nro: p.nro,
+        grado: p.grado,
+        especialidad: p.especialidad,
+        apellidoNombre: p.apellidoNombre,
+        dependenciaId: depMap[cod],
+        cargo: p.cargo,
+        estado: "Activo",
+      },
+      create: {
+        id: p.nro,
+        nro: p.nro,
+        grado: p.grado,
+        especialidad: p.especialidad,
+        apellidoNombre: p.apellidoNombre,
+        dependenciaId: depMap[cod],
+        cargo: p.cargo,
+        estado: "Activo",
+      },
+    });
+    importados++;
+  }
+
   console.log("Seed completado.");
-  console.log("Usuarios creados:");
+  console.log(`  Personal importado: ${importados}`);
+  console.log("Usuarios:");
   console.log("  admin / admin123 (Administrador)");
   console.log("  dirint / dirint123 (Dir Int)");
   console.log("  sastre / sastre123 (Sas Mil Cen)");
