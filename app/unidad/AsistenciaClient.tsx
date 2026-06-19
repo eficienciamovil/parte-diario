@@ -183,6 +183,7 @@ export default function AsistenciaClient({
         <table className="w-full text-sm">
           <thead className="bg-slate-700 text-white">
             <tr>
+              <th className="px-3 py-3 text-center w-10">#</th>
               <th className="px-4 py-3 text-left">Grado</th>
               <th className="px-4 py-3 text-left">Apellido y Nombre</th>
               <th className="px-4 py-3 text-center">Estado</th>
@@ -201,6 +202,9 @@ export default function AsistenciaClient({
                     esAusente ? "bg-red-50" : ""
                   }`}
                 >
+                  <td className="px-3 py-3 text-center text-slate-400 text-xs font-mono">
+                    {i + 1}
+                  </td>
                   <td className="px-4 py-3 text-slate-600 whitespace-nowrap">
                     {detalle.personal.grado}
                   </td>

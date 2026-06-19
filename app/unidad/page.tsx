@@ -4,6 +4,7 @@ import { crearParte, getPartePorDependenciaYFecha } from "@/app/actions/partes";
 import AsistenciaClient from "./AsistenciaClient";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { sortPorGrado } from "@/lib/grado-order";
 
 export default async function UnidadPage() {
   const session = await verifySession();
@@ -48,6 +49,18 @@ export default async function UnidadPage() {
         });
         parte = await getPartePorDependenciaYFecha(session.dependenciaId, hoy);
       }
+    }
+
+    // Ordenar detalles por grado jerárquico, luego por apellido
+    if (parte) {
+      parte = {
+        ...parte,
+        detalles: sortPorGrado(
+          parte.detalles,
+          (d: any) => d.personal.grado,
+          (d: any) => d.personal.apellidoNombre
+        ),
+      };
     }
 
     causas = await (db as any).causaAusencia.findMany({

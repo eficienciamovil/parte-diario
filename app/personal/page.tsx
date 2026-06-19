@@ -1,9 +1,11 @@
 import { getPersonal } from "@/app/actions/personal";
 import Link from "next/link";
 import ImportarPersonalBtn from "./ImportarPersonalBtn";
+import { sortPorGrado } from "@/lib/grado-order";
 
 export default async function PersonalPage() {
-  const personal = await getPersonal();
+  const personalRaw = await getPersonal();
+  const personal = sortPorGrado(personalRaw, (p: any) => p.grado, (p: any) => p.apellidoNombre);
 
   return (
     <div>
@@ -24,6 +26,7 @@ export default async function PersonalPage() {
         <table className="w-full text-sm">
           <thead className="bg-slate-100 text-slate-700 uppercase text-xs">
             <tr>
+              <th className="text-center px-3 py-3 w-10">#</th>
               <th className="text-left px-4 py-3">Grado</th>
               <th className="text-left px-4 py-3">Apellido y Nombre</th>
               <th className="text-left px-4 py-3">DNI / Legajo</th>
@@ -36,13 +39,14 @@ export default async function PersonalPage() {
           <tbody className="divide-y divide-gray-100">
             {personal.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-gray-400">
+                <td colSpan={8} className="px-4 py-8 text-center text-gray-400">
                   No hay personal cargado.
                 </td>
               </tr>
             )}
-            {personal.map((p: any) => (
+            {personal.map((p: any, i: number) => (
               <tr key={p.id} className={`hover:bg-gray-50 ${p.estado !== "Activo" ? "opacity-60" : ""}`}>
+                <td className="px-3 py-3 text-center text-slate-400 text-xs font-mono">{i + 1}</td>
                 <td className="px-4 py-3 font-medium">{p.grado}</td>
                 <td className="px-4 py-3">{p.apellidoNombre}</td>
                 <td className="px-4 py-3 text-gray-600">{p.dni ?? "-"}</td>
