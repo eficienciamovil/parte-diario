@@ -1,5 +1,6 @@
 import { getPersonal } from "@/app/actions/personal";
 import Link from "next/link";
+import ImportarPersonalBtn from "./ImportarPersonalBtn";
 
 export default async function PersonalPage() {
   const personal = await getPersonal();
@@ -8,12 +9,15 @@ export default async function PersonalPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-slate-800">Personal</h1>
-        <Link
-          href="/personal/nuevo"
-          className="bg-slate-700 text-white px-4 py-2 rounded text-sm hover:bg-slate-600"
-        >
-          Nuevo Personal
-        </Link>
+        <div className="flex gap-2">
+          <ImportarPersonalBtn />
+          <Link
+            href="/personal/nuevo"
+            className="bg-slate-700 text-white px-4 py-2 rounded text-sm hover:bg-slate-600"
+          >
+            Nuevo Personal
+          </Link>
+        </div>
       </div>
 
       <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
