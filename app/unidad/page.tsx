@@ -30,6 +30,7 @@ export default async function UnidadPage() {
         dependenciaId: session.dependenciaId,
         fecha: hoy.toISOString(),
         responsableCarga: session.nombre,
+        _skipRevalidate: true,
       });
       parte = await getPartePorDependenciaYFecha(session.dependenciaId, hoy);
     }

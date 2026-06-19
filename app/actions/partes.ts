@@ -48,6 +48,7 @@ export async function crearParte(data: {
   dependenciaId: number;
   fecha: string;
   responsableCarga?: string;
+  _skipRevalidate?: boolean;
 }) {
   const fecha = new Date(data.fecha);
   const dep = await (db as any).dependencia.findUnique({
@@ -80,7 +81,7 @@ export async function crearParte(data: {
     });
   }
 
-  revalidatePath("/partes");
+  if (!data._skipRevalidate) revalidatePath("/partes");
   return parte;
 }
 
