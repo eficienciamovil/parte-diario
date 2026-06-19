@@ -45,7 +45,6 @@ export default async function UnidadPage() {
             personalId: p.id,
             situacion: "Presente",
           })),
-          skipDuplicates: true,
         });
         parte = await getPartePorDependenciaYFecha(session.dependenciaId, hoy);
       }
