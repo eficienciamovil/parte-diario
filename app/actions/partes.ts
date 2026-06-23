@@ -3,7 +3,7 @@
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { format } from "date-fns";
-import { verifySession } from "@/lib/dal";
+import { verifySession, verifyAdmin } from "@/lib/dal";
 
 function inicioDia(fecha: Date | string): Date {
   const d = new Date(fecha);
@@ -216,6 +216,25 @@ export async function getPartePorDependenciaYFecha(dependenciaId: number, fecha:
       },
     },
   });
+}
+
+export async function limpiarPartesPorFecha(fecha: string): Promise<number> {
+  await verifyAdmin();
+  const base = new Date(fecha + "T12:00:00");
+  const partes = await (db as any).parteDiario.findMany({
+    where: { fecha: { gte: inicioDia(base), lte: finDia(base) } },
+    select: { id: true },
+  });
+  if (partes.length === 0) return 0;
+  await (db as any).detalleAsistencia.deleteMany({
+    where: { parteId: { in: partes.map((p: any) => p.id) } },
+  });
+  await (db as any).parteDiario.deleteMany({
+    where: { id: { in: partes.map((p: any) => p.id) } },
+  });
+  revalidatePath("/dashboard");
+  revalidatePath("/consolidado");
+  return partes.length;
 }
 
 export async function getConsolidadoPorFecha(fecha: string) {

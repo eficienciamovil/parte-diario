@@ -3,6 +3,7 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import Link from "next/link";
 import DateFilter from "@/app/components/DateFilter";
+import LimpiarPartesBtn from "./LimpiarPartesBtn";
 
 export default async function DashboardPage({
   searchParams,
@@ -29,6 +30,7 @@ export default async function DashboardPage({
         <h1 className="text-2xl font-bold text-slate-800">Resumen General</h1>
         <div className="flex items-center gap-3">
           <DateFilter fecha={fecha} basePath="/dashboard" />
+          <LimpiarPartesBtn fecha={fecha} />
           <Link
             href={`/partes/nuevo?fecha=${fecha}`}
             className="bg-slate-700 text-white px-4 py-2 rounded text-sm hover:bg-slate-600"
