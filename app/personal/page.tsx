@@ -1,6 +1,7 @@
 import { getPersonal } from "@/app/actions/personal";
 import Link from "next/link";
 import ImportarPersonalBtn from "./ImportarPersonalBtn";
+import AccionesPersonalBtn from "./AccionesPersonalBtn";
 import { sortPorGrado } from "@/lib/grado-order";
 
 export default async function PersonalPage() {
@@ -66,9 +67,7 @@ export default async function PersonalPage() {
                   </span>
                 </td>
                 <td className="px-4 py-3 text-center">
-                  <Link href={`/personal/${p.id}`} className="text-slate-700 hover:underline text-xs">
-                    Editar
-                  </Link>
+                  <AccionesPersonalBtn id={p.id} estado={p.estado} />
                 </td>
               </tr>
             ))}

@@ -54,6 +54,14 @@ export async function eliminarPersonal(id: number) {
   revalidatePath("/personal");
 }
 
+export async function reactivarPersonal(id: number) {
+  await (db as any).personal.update({
+    where: { id },
+    data: { estado: "Activo" },
+  });
+  revalidatePath("/personal");
+}
+
 export async function importarPersonalDesdeData(): Promise<{ importados: number; errores: number }> {
   await verifyAdmin();
 
