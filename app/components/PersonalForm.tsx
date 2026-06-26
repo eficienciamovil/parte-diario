@@ -25,7 +25,8 @@ interface Props {
 const GRADOS = [
   "Tte Cnel", "Mayor", "Capitán", "Tte 1ro", "Teniente", "Subteniente",
   "Suboficial Mayor", "Suboficial Principal", "Sargento Ayudante",
-  "Sargento 1ro", "Sargento", "Cabo 1ro", "Cabo", "Soldado Voluntario",
+  "Sargento 1ro", "Sargento", "Cabo 1ro", "Cabo",
+  "SV 1ra", "SV 2da", "SV 2da EC",
   "Civil",
 ];
 
