@@ -47,6 +47,7 @@ export default function AsistenciaClient({
     )
   );
 
+  const [busqueda, setBusqueda] = useState("");
   const [isPending, startTransition] = useTransition();
   const [guardado, setGuardado] = useState(false);
   const [cerrandoParte, setCerrandoParte] = useState(false);
@@ -179,6 +180,16 @@ export default function AsistenciaClient({
         </div>
       </div>
 
+      <div className="mb-3">
+        <input
+          type="text"
+          placeholder="Buscar por apellido..."
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
+          className="w-full border border-slate-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
+        />
+      </div>
+
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-slate-700 text-white">
@@ -191,7 +202,13 @@ export default function AsistenciaClient({
             </tr>
           </thead>
           <tbody>
-            {parte.detalles.map((detalle, i) => {
+            {parte.detalles
+              .filter((d) =>
+                busqueda.trim() === "" ||
+                d.personal.apellidoNombre.toLowerCase().includes(busqueda.toLowerCase().trim())
+              )
+              .map((detalle) => {
+              const i = parte.detalles.indexOf(detalle);
               const val = detalles[detalle.id];
               const esAusente = val.situacion !== "Presente";
 
