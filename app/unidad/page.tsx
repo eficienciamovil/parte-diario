@@ -35,14 +35,16 @@ export default async function UnidadPage() {
       parte = await getPartePorDependenciaYFecha(session.dependenciaId, hoy);
     }
 
-    // Si el parte existe pero no tiene detalles, repoblar desde el personal activo
-    if (parte && parte.detalles.length === 0 && parte.estado !== "Cerrado") {
+    // Sincronizar parte con el personal activo: agregar los que faltan
+    if (parte && parte.estado !== "Cerrado") {
       const personal = await (db as any).personal.findMany({
         where: { dependenciaId: session.dependenciaId, estado: "Activo" },
       });
-      if (personal.length > 0) {
+      const yaEnParte = new Set(parte.detalles.map((d: any) => d.personalId));
+      const faltantes = personal.filter((p: any) => !yaEnParte.has(p.id));
+      if (faltantes.length > 0) {
         await (db as any).detalleAsistencia.createMany({
-          data: personal.map((p: any) => ({
+          data: faltantes.map((p: any) => ({
             parteId: parte.id,
             personalId: p.id,
             situacion: "Presente",
