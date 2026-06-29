@@ -35,13 +35,20 @@ export default async function UnidadPage() {
       parte = await getPartePorDependenciaYFecha(session.dependenciaId, hoy);
     }
 
-    // Sincronizar parte con el personal activo: agregar los que faltan
+    // Sincronizar parte con el personal activo: agregar faltantes y quitar dados de baja
     if (parte && parte.estado !== "Cerrado") {
       const personal = await (db as any).personal.findMany({
         where: { dependenciaId: session.dependenciaId, estado: "Activo" },
       });
+      const activosIds = new Set(personal.map((p: any) => p.id));
       const yaEnParte = new Set(parte.detalles.map((d: any) => d.personalId));
+
       const faltantes = personal.filter((p: any) => !yaEnParte.has(p.id));
+      const sobrantesIds = parte.detalles
+        .filter((d: any) => !activosIds.has(d.personalId))
+        .map((d: any) => d.id);
+
+      let cambios = false;
       if (faltantes.length > 0) {
         await (db as any).detalleAsistencia.createMany({
           data: faltantes.map((p: any) => ({
@@ -50,6 +57,15 @@ export default async function UnidadPage() {
             situacion: "Presente",
           })),
         });
+        cambios = true;
+      }
+      if (sobrantesIds.length > 0) {
+        await (db as any).detalleAsistencia.deleteMany({
+          where: { id: { in: sobrantesIds } },
+        });
+        cambios = true;
+      }
+      if (cambios) {
         parte = await getPartePorDependenciaYFecha(session.dependenciaId, hoy);
       }
     }
